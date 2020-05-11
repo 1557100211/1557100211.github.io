@@ -2,11 +2,11 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://1557100211.github.io</id>
     <title>github博客</title>
-    <updated>2020-05-11T06:09:19.344Z</updated>
+    <updated>2020-05-11T06:13:28.100Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://1557100211.github.io"/>
     <link rel="self" href="https://1557100211.github.io/atom.xml"/>
-    <subtitle>温故而知新</subtitle>
+    <subtitle>小舟从此逝，江海寄余生</subtitle>
     <logo>https://1557100211.github.io/images/avatar.png</logo>
     <icon>https://1557100211.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, github博客</rights>
