@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://1557100211.github.io</id>
     <title>github博客</title>
-    <updated>2020-05-18T01:56:31.808Z</updated>
+    <updated>2020-05-18T03:01:59.851Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://1557100211.github.io"/>
     <link rel="self" href="https://1557100211.github.io/atom.xml"/>
@@ -10,6 +10,27 @@
     <logo>https://1557100211.github.io/images/avatar.png</logo>
     <icon>https://1557100211.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, github博客</rights>
+    <entry>
+        <title type="html"><![CDATA[SVN迁移GIT]]></title>
+        <id>https://1557100211.github.io/post/mkm2IT70s/</id>
+        <link href="https://1557100211.github.io/post/mkm2IT70s/">
+        </link>
+        <updated>2020-05-18T02:50:28.000Z</updated>
+        <content type="html"><![CDATA[<h4 id="迁移过程">迁移过程</h4>
+<ol>
+<li>拉取svn代码并转为git（输入用户名密码）<pre><code class="language-java">git svn clone   http://xxxx.com/project
+</code></pre>
+<img src="https://1557100211.github.io/post-images/1589770874769.png" alt="" loading="lazy"></li>
+<li>关联远程仓库(保证仓库是新建的并且没有任何提交)<pre><code class="language-java">cd project/
+git remote add origin http://xxxx.com/project
+</code></pre>
+</li>
+<li>提交<pre><code class="language-java">git push -u origin master
+</code></pre>
+</li>
+</ol>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Mybatis中tinyint(1)转化为boolean]]></title>
         <id>https://1557100211.github.io/post/mybatis-zhong-tinyint1zhuan-hua-wei-boolean/</id>
