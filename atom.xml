@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://1557100211.github.io</id>
     <title>github博客</title>
-    <updated>2020-05-18T01:39:54.152Z</updated>
+    <updated>2020-05-18T01:56:31.808Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://1557100211.github.io"/>
     <link rel="self" href="https://1557100211.github.io/atom.xml"/>
@@ -33,15 +33,6 @@
         </link>
         <updated>2020-05-15T09:43:47.000Z</updated>
         <content type="html"><![CDATA[<p>工程</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[测试gridea发布]]></title>
-        <id>https://1557100211.github.io/post/ce-shi-gridea-fa-bu/</id>
-        <link href="https://1557100211.github.io/post/ce-shi-gridea-fa-bu/">
-        </link>
-        <updated>2020-05-11T06:18:24.000Z</updated>
-        <content type="html"><![CDATA[<p>测试gridea发布</p>
 ]]></content>
     </entry>
     <entry>
