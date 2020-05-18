@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://1557100211.github.io</id>
     <title>github博客</title>
-    <updated>2020-05-15T09:44:18.416Z</updated>
+    <updated>2020-05-18T01:35:16.378Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://1557100211.github.io"/>
     <link rel="self" href="https://1557100211.github.io/atom.xml"/>
@@ -10,6 +10,22 @@
     <logo>https://1557100211.github.io/images/avatar.png</logo>
     <icon>https://1557100211.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, github博客</rights>
+    <entry>
+        <title type="html"><![CDATA[Mybatis中tinyint(1)转化为boolean]]></title>
+        <id>https://1557100211.github.io/post/mybatis-zhong-tinyint1zhuan-hua-wei-boolean/</id>
+        <link href="https://1557100211.github.io/post/mybatis-zhong-tinyint1zhuan-hua-wei-boolean/">
+        </link>
+        <updated>2020-05-18T01:33:36.000Z</updated>
+        <content type="html"><![CDATA[<h4 id="问题描述">问题描述:</h4>
+<p>使用Mybatis查询tinyint(1)字段数据,返回值为Map类型,那么tinyint(1)的数据默认会转化为boolean类型数据.</p>
+<h4 id="解决方案">解决方案:</h4>
+<ol>
+<li>使用ifnull(column, 0)处理该字段,个人测试过可以;</li>
+<li>在jdbcUrl添加参数: tinyInt1isBit=false（默认为true）；</li>
+<li>避免使用长度为1的tinyint类型字段存储数字格式的数据;</li>
+</ol>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[优秀源码推荐]]></title>
         <id>https://1557100211.github.io/post/you-xiu-yuan-ma-tui-jian/</id>
