@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://1557100211.github.io</id>
     <title>github博客</title>
-    <updated>2020-05-19T06:18:42.373Z</updated>
+    <updated>2020-05-19T06:54:09.417Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://1557100211.github.io"/>
     <link rel="self" href="https://1557100211.github.io/atom.xml"/>
@@ -10,6 +10,68 @@
     <logo>https://1557100211.github.io/images/avatar.png</logo>
     <icon>https://1557100211.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, github博客</rights>
+    <entry>
+        <title type="html"><![CDATA[问题总结一、java final常量修改后，新重新编译class并更新所有引用类]]></title>
+        <id>https://1557100211.github.io/post/2ZTgQPbdp/</id>
+        <link href="https://1557100211.github.io/post/2ZTgQPbdp/">
+        </link>
+        <updated>2020-05-19T06:40:44.000Z</updated>
+        <content type="html"><![CDATA[<blockquote>
+<p>线上同事发现了一个问题，更新常量类里面的常量后发现没出现效果，反编译后看结果没变....后续查资料结果：<br>
+程序中使用的各种常量用一个类来统一管理，类似：</p>
+</blockquote>
+<pre><code class="language-java">public class AppConst {  
+    public static final String STR_1 = &quot;String1&quot;;  
+    public static final String STR_2 = &quot;String2&quot;;  
+    ......  
+}  
+</code></pre>
+<p>然后在某些逻辑代码段里使用了这些常量。这样做可以便于管理常量，避免了大量的magic number/text，在修改常量内容时只需改这一个类就行了，但有时候会奇怪地发现，重新编译打包的程序依旧我行我素，并没有即时反应我们对常量的修改，这是何解呢？<br>
+在之前的《JVM学习笔记三--类的初始化》中我曾提到，静态常量（即用 static final 修饰的变量）是编译时常量，当一个class文件编译完毕，它内部使用到的所有常量的具体值就已经确定了，不能想当然地以为它在运行时并连接常量管理类之 后才会以引用方式使用常量。比如下面这段代码：</p>
+<pre><code class="language-java">import AppConst;  
+public class SomeService {  
+    public void serviceJob1() {  
+        System.out.println(AppConst.STR_1);  
+    }  
+}  
+</code></pre>
+<p>类SomeService使用了STR_1这个常量，表面上是通过AppConst类取得的这个值，实际上在SomeService被编译后，其代码其实变成了</p>
+<pre><code class="language-java">public class SomeService {  
+    public void serviceJob1() {  
+        System.out.println(&quot;String1&quot;);  
+    }  
+}
+</code></pre>
+<p>这里面根本没有AppConst什么事，所以你即使修改了AppConst的相关常量，令STR_1 = &quot;NotString1&quot;,SomeService可能依然会打印&quot;String1&quot;,因为SomeService的代码没有任何修改，在增量编译的情况 下，它的class文件不会被重新编译。<br>
+明白了上面这些，大致就知道怎么办了，我的方法有两个：</p>
+<ol>
+<li>原始条件下，删除class文件后手动重编译。</li>
+<li>使用IDE的时候， 先对SomeService做一个细微修改并保存（会自动编译），然后再修改回来并保存（再次自动编译）。如此class文件就会被更新了。<br>
+是这样的，单纯的修改静态变量是没用的，还要重新编辑所有引用静态变量的类，不然不会生效的。<br>
+改成</li>
+</ol>
+<pre><code class="language-java">public class AppConst {    
+  public static getString2(){   
+              return &quot;String2&quot;;    
+  }   
+  ......    
+}    
+</code></pre>
+<p>就可以仅仅修改并编译一个类就行了 .<br>
+从根本上来解决此问题得这么做，最简单。</p>
+<pre><code class="language-java">public class AppConst {     
+    public static final String STR_1 = new String(&quot;String1&quot;);     
+    public static final String STR_2 = new String(&quot;String2&quot;);     
+    public static final int number1=new Integer(123);   
+    ......     
+}   
+</code></pre>
+<p>反编译，你会发现在引用此静态类属性的时候，引用代码不是直接用具体值替代，而还是源代码里的引用。</p>
+<blockquote>
+<p>一句话总结，在静态类里定义的静态属性，坚决不用引用类型，而需要用对象类型。</p>
+</blockquote>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[MySQL数据库统计信息查询]]></title>
         <id>https://1557100211.github.io/post/7v_zfrTYs/</id>

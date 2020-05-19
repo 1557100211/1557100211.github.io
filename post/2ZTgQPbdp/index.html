@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>问题总结一、java final常量修改后，新重新编译class并更新所有引用类 | github博客</title>
+<meta name="description" content="小舟从此逝，江海寄余生">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://1557100211.github.io/favicon.ico?v=1589871228589">
+<link rel="stylesheet" href="https://1557100211.github.io/styles/main.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://1557100211.github.io">
+        <img src="https://1557100211.github.io/images/avatar.png?v=1589871228589" class="site-logo">
+        <h1 class="site-title">github博客</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="share" class="site-nav">
+            分享
+          </a>
+        
+      
+        
+          <a href="OM" class="site-nav">
+            运维
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+          <a class="social-link" href="https://github.com/1557100211" target="_blank">
+            <i class="fab fa-github"></i>
+          </a>
+        
+      
+        
+      
+        
+      
+        
+          <a class="social-link" href="https://www.zhihu.com/people/pcoding-23" target="_blank">
+            <i class="fab fa-zhihu"></i>
+          </a>
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      小舟从此逝，江海寄余生
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">问题总结一、java final常量修改后，新重新编译class并更新所有引用类</h2>
+            <div class="post-date">2020-05-19</div>
+            
+              <div class="feature-container" style="background-image: url('https://1557100211.github.io/post-images/2ZTgQPbdp.jpg')">
+              </div>
+            
+            <div class="post-content">
+              <blockquote>
+<p>线上同事发现了一个问题，更新常量类里面的常量后发现没出现效果，反编译后看结果没变....后续查资料结果：<br>
+程序中使用的各种常量用一个类来统一管理，类似：</p>
+</blockquote>
+<pre><code class="language-java">public class AppConst {  
+    public static final String STR_1 = &quot;String1&quot;;  
+    public static final String STR_2 = &quot;String2&quot;;  
+    ......  
+}  
+</code></pre>
+<p>然后在某些逻辑代码段里使用了这些常量。这样做可以便于管理常量，避免了大量的magic number/text，在修改常量内容时只需改这一个类就行了，但有时候会奇怪地发现，重新编译打包的程序依旧我行我素，并没有即时反应我们对常量的修改，这是何解呢？<br>
+在之前的《JVM学习笔记三--类的初始化》中我曾提到，静态常量（即用 static final 修饰的变量）是编译时常量，当一个class文件编译完毕，它内部使用到的所有常量的具体值就已经确定了，不能想当然地以为它在运行时并连接常量管理类之 后才会以引用方式使用常量。比如下面这段代码：</p>
+<pre><code class="language-java">import AppConst;  
+public class SomeService {  
+    public void serviceJob1() {  
+        System.out.println(AppConst.STR_1);  
+    }  
+}  
+</code></pre>
+<p>类SomeService使用了STR_1这个常量，表面上是通过AppConst类取得的这个值，实际上在SomeService被编译后，其代码其实变成了</p>
+<pre><code class="language-java">public class SomeService {  
+    public void serviceJob1() {  
+        System.out.println(&quot;String1&quot;);  
+    }  
+}
+</code></pre>
+<p>这里面根本没有AppConst什么事，所以你即使修改了AppConst的相关常量，令STR_1 = &quot;NotString1&quot;,SomeService可能依然会打印&quot;String1&quot;,因为SomeService的代码没有任何修改，在增量编译的情况 下，它的class文件不会被重新编译。<br>
+明白了上面这些，大致就知道怎么办了，我的方法有两个：</p>
+<ol>
+<li>原始条件下，删除class文件后手动重编译。</li>
+<li>使用IDE的时候， 先对SomeService做一个细微修改并保存（会自动编译），然后再修改回来并保存（再次自动编译）。如此class文件就会被更新了。<br>
+是这样的，单纯的修改静态变量是没用的，还要重新编辑所有引用静态变量的类，不然不会生效的。<br>
+改成</li>
+</ol>
+<pre><code class="language-java">public class AppConst {    
+  public static getString2(){   
+              return &quot;String2&quot;;    
+  }   
+  ......    
+}    
+</code></pre>
+<p>就可以仅仅修改并编译一个类就行了 .<br>
+从根本上来解决此问题得这么做，最简单。</p>
+<pre><code class="language-java">public class AppConst {     
+    public static final String STR_1 = new String(&quot;String1&quot;);     
+    public static final String STR_2 = new String(&quot;String2&quot;);     
+    public static final int number1=new Integer(123);   
+    ......     
+}   
+</code></pre>
+<p>反编译，你会发现在引用此静态类属性的时候，引用代码不是直接用具体值替代，而还是源代码里的引用。</p>
+<blockquote>
+<p>一句话总结，在静态类里定义的静态属性，坚决不用引用类型，而需要用对象类型。</p>
+</blockquote>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://1557100211.github.io/tag/VmonvTXl3/" class="tag">
+                    问题
+                  </a>
+                
+                  <a href="https://1557100211.github.io/tag/47KpFfCQDa/" class="tag">
+                    总结
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://1557100211.github.io/post/7v_zfrTYs/">
+                  <h3 class="post-title">
+                    MySQL数据库统计信息查询
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+  </body>
+</html>
