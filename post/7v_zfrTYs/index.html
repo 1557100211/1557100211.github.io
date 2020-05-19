@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>Gridea | github博客</title>
+<title>MySQL数据库统计信息查询 | github博客</title>
 <meta name="description" content="小舟从此逝，江海寄余生">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -110,35 +110,56 @@
 
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
-          <h2 class="current-tag">标签: Gridea</h2>
-          
-            <article class="post-item">
-              <div class="left">
-                <a href="https://1557100211.github.io/post/hello-gridea/">
-                  <h2 class="post-title">Hello Gridea</h2>
-                </a>
-                <div class="post-date">
-                  2018-12-12
-                </div>
-                <div class="post-abstract">
-                  <p>👏  欢迎使用 <strong>Gridea</strong> ！<br>
-✍️  <strong>Gridea</strong> 一个静态博客写作客户端。你可以用它来记录你的生活、心情、知识、笔记、创意... ...</p>
+          <div class="post-detail">
+            <h2 class="post-title">MySQL数据库统计信息查询</h2>
+            <div class="post-date">2020-05-19</div>
+            
+            <div class="post-content">
+              <h4 id="数据库表数量">数据库表数量</h4>
+<pre><code class="language-java">#查询MySQL服务中数据库表数据量
+SELECT COUNT(*) TABLES, table_schema FROM information_schema.TABLES    GROUP BY table_schema;
+#查询指定数据库表数量
+SELECT COUNT(*) TABLES, table_schema FROM information_schema.TABLES   WHERE table_schema = 'szdb'
+</code></pre>
+<h4 id="查询数据库字段">查询数据库字段</h4>
+<pre><code class="language-java">#查询一个表中有多少字段
+SELECT COUNT(*) FROM information_schema. COLUMNS WHERE table_schema = 'szdb' AND table_name = 'SystemLog';
+#查询一个数据库中有多少字段
+SELECT COUNT(column_name) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = 'szdb';
+#查询数据库中所以表、字段、字段类型、注释等信息
+SELECT TABLE_NAME, column_name, DATA_TYPE, column_comment FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = 'szdb' ;
+</code></pre>
+<h4 id="查询数据库中持久化的数据量">查询数据库中持久化的数据量</h4>
+<blockquote>
+<p>MySQL中有一个名为 information_schema 的数据库，在该库中有一个 TABLES 表，这个表主要字段分别：TABLE_SCHEMA : 数据库名，TABLE_NAME：表名，ENGINE：所使用的存储引擎，TABLES_ROWS：记录数，DATA_LENGTH：数据大小，INDEX_LENGTH：索引大小use information_schema；统计数据主要使用的就是这张表了。</p>
+</blockquote>
+<pre><code class="language-java">#统计数据库中每个表保存的数据量
+use information_schema;
+SELECT TABLE_NAME, (DATA_LENGTH/1024/1024) as DataM ,(INDEX_LENGTH/1024/1024) as IndexM,((DATA_LENGTH+INDEX_LENGTH)/1024/1024) as AllM,TABLE_ROWS FROM TABLES WHERE TABLE_SCHEMA = 'szdb'
 
-                </div>
+#查询每张表数量
+select table_name,table_rows from tables where TABLE_SCHEMA = 'szdb' order by table_rows desc;
+
+#数据库总数量
+SELECT sum(table_rows) from tables where TABLE_SCHEMA = 'szdb' order by table_rows desc;
+</code></pre>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://1557100211.github.io/post/mkm2IT70s/">
+                  <h3 class="post-title">
+                    SVN迁移GIT
+                  </h3>
+                </a>
               </div>
-              
-                <a class="right" href="https://1557100211.github.io/post/hello-gridea/">
-                  <div class="feature-container" style="background-image: url('https://1557100211.github.io/post-images/hello-gridea.png')">
-                  </div>
-                </a>
-              
-            </article>
-          
+            
 
-          <div class="pagination-container">
-  
-  
-</div>
+            
+
+          </div>
 
         </div>
       </div>
