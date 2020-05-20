@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>Nginx监控工具-GoAccess | github博客</title>
+<meta name="description" content="小舟从此逝，江海寄余生">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://1557100211.github.io/favicon.ico?v=1589960461755">
+<link rel="stylesheet" href="https://1557100211.github.io/styles/main.css">
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+
+
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://1557100211.github.io">
+        <img src="https://1557100211.github.io/images/avatar.png?v=1589960461755" class="site-logo">
+        <h1 class="site-title">github博客</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="share" class="site-nav">
+            分享
+          </a>
+        
+      
+        
+          <a href="OM" class="site-nav">
+            运维
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+          <a class="social-link" href="https://github.com/1557100211" target="_blank">
+            <i class="fab fa-github"></i>
+          </a>
+        
+      
+        
+      
+        
+      
+        
+          <a class="social-link" href="https://www.zhihu.com/people/pcoding-23" target="_blank">
+            <i class="fab fa-zhihu"></i>
+          </a>
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      小舟从此逝，江海寄余生
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">Nginx监控工具-GoAccess</h2>
+            <div class="post-date">2020-05-20</div>
+            
+              <div class="feature-container" style="background-image: url('https://1557100211.github.io/post-images/BpGxZ4yx7.png')">
+              </div>
+            
+            <div class="post-content">
+              <h5 id="why-goaccess">Why GoAccess?</h5>
+<blockquote>
+<p>GoAccess 被设计成快速的并基于终端的日志分析工具。其核心理念是不需要通过 Web 浏览器就能快速分析并实时查看 Web 服务器的统计数据(这对于需要使用 SSH 来对访问日志进行快速分析或者就是喜欢在终端环境下工作的人来说是超赞的)。<br>
+终端输出仅仅是默认的输出方式，GoAccess 还支持生成完整的实时 HTML 报告(这对分析、监控以及数据可视化都是极好的)，以及 JSON 和 CSV 格式的报告。</p>
+</blockquote>
+<h5 id="下载地址">下载地址</h5>
+<blockquote>
+<p>https://goaccess.io/download</p>
+</blockquote>
+<h5 id="安装">安装</h5>
+<h6 id="yum安装">yum安装</h6>
+<pre><code class="language-java">yum install glib2 glib2-devel GeoIP-devel  ncurses-devel zlib zlib-develyum install gcc -y
+yum -y install GeoIP-update
+yum install goaccess
+#修改/etc/nginx/nginx.conf文件的日志存储格式
+log_format  main  '$remote_addr - $remote_user [$time_local] requesthost:&quot;$http_host&quot;; &quot;$request&quot; requesttime:&quot;$request_time&quot;; '
+        '$status $body_bytes_sent &quot;$http_referer&quot; - $request_body'
+        '&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;';        
+#修改文件/etc/goaccess.conf改成goaccess格式标准对应为
+time-format %T
+date-format %d/%b/%Y
+log-format %h - %^ [%d:%t %^] requesthost:&quot;%v&quot;; &quot;%r&quot; requesttime:&quot;%T&quot;; %s %b &quot;%R&quot; - %^&quot;%u&quot;
+#测试生成页面
+goaccess -f /var/log/nginx/access.log -c -a&gt;/usr/share/nginx/html/go.html
+</code></pre>
+<h6 id="源码安装">源码安装</h6>
+<pre><code class="language-java">#yum安装依赖包
+yum install glib2 glib2-devel GeoIP-devel  ncurses-devel zlib zlib-devel
+yum install gcc -y
+rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
+yum -y install GeoIP-update
+
+#下载goaccess源码包，并解压编译安装
+wget https://tar.goaccess.io/goaccess-1.2.tar.gz
+tar xzvf goaccess-1.2.tar.gz
+cd goaccess-1.2/./configure --enable-geoip --enable-utf8make &amp;&amp; make install
+
+#修改/etc/nginx/nginx.conf文件的日志存储格式
+log_format  main  '$remote_addr - $remote_user [$time_local] requesthost:&quot;$http_host&quot;; &quot;$request&quot; requesttime:&quot;$request_time&quot;; '
+        '$status $body_bytes_sent &quot;$http_referer&quot; - $request_body'                      '&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;';       
+#修改文件/usr/local/etc/goaccess.conf改成goaccess格式标准对应为
+time-format %T
+date-format %d/%b/%Y
+log-format %h - %^ [%d:%t %^] requesthost:&quot;%v&quot;; &quot;%r&quot; requesttime:&quot;%T&quot;; %s %b &quot;%R&quot; - %^&quot;%u&quot;
+#测试生成页面
+goaccess -f /var/log/nginx/access.log -c -a&gt;/usr/share/nginx/html/go.html
+#后台实时生成数据到goaccess页面
+/usr/local/bin/goaccess /var/log/nginx/access.log -o /usr/share/nginx/html/go.html  --real-time-html &amp;
+</code></pre>
+<h5 id="基本语法">基本语法</h5>
+<blockquote>
+<p>goaccess [ -b ][ -s ][ -e IP_ADDRESS][ - a ] &lt;-f log_file &gt;<br>
+参数说明：<br>
+-f – 日志文件名<br>
+-b – 开启流量统计，如果希望加快分析速度不建议使用该参数<br>
+-s – 开启HTTP响应代码统计<br>
+-a – 开启用户代理统计<br>
+-e – 开启指定IP地址统计，默认禁用<br>
+-p -指定goacces用户配置文件路径</p>
+</blockquote>
+<pre><code class="language-java"> goaccess access2.log -p /etc/goaccess/goaccess.conf -o /mnt/d/dev_soft/goAccess/report.html --real-time-html --port=8888 --geoip-database=/mnt/d/dev_soft/goAccess/GeoLite2-City.mmdb
+</code></pre>
+<h6 id="配置选项">配置选项</h6>
+<blockquote>
+<p>GoAccess 拥有多个配置选项。获取完整的最新配置选项列表，请运行：./configure --help</p>
+</blockquote>
+<ul>
+<li>--enable-debug<br>
+使用调试标志编译且关闭编译器优化。</li>
+<li>--enable-utf8<br>
+宽字符支持。依赖 Ncursesw 模块。</li>
+<li>--enable-geoip=&lt;legacy|mmdb&gt;<br>
+地理位置支持。依赖 MaxMind GeoIP 模块。legacy 将使用原始 GeoIP 数据库。mmdb 将使用增强版 GeoIP2 数据库。</li>
+<li>--enable-tcb=&lt;memhash|btree&gt;<br>
+Tokyo Cabinet 存储支持。 memhash 将使用 Tokyo Cabinet 的内存哈希数据库。 btree 将使用 Tokyo Cabinet 的磁盘 B+Tree 数据库。</li>
+<li>--disable-zlib<br>
+禁止在 B+Tree 数据库上使用 zlib 压缩。</li>
+<li>--disable-bzip<br>
+禁止在 B+Tree 数据库上使用 bzip2 压缩。</li>
+<li>--with-getline<br>
+使用动态扩展行缓冲区用来解析完整的行请求，否则将使用固定大小(4096)的缓冲区。</li>
+<li>--with-openssl<br>
+使 GoAccess 与其 WebSocket 服务器之间的通信能够支持 OpenSSL。</li>
+</ul>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://1557100211.github.io/tag/h6RInfCap/" class="tag">
+                    Nginx
+                  </a>
+                
+                  <a href="https://1557100211.github.io/tag/P1anjN68S9/" class="tag">
+                    GoAccess
+                  </a>
+                
+                  <a href="https://1557100211.github.io/tag/e4bnw_xc8Z/" class="tag">
+                    监控
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://1557100211.github.io/post/aEGAJiLzW/">
+                  <h3 class="post-title">
+                    Tomcat监控工具
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script type="application/javascript">
+
+AOS.init();
+
+hljs.initHighlightingOnLoad()
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+  </body>
+</html>

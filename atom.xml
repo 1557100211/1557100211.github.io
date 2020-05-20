@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://1557100211.github.io</id>
     <title>github博客</title>
-    <updated>2020-05-20T06:30:15.471Z</updated>
+    <updated>2020-05-20T07:41:36.185Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://1557100211.github.io"/>
     <link rel="self" href="https://1557100211.github.io/atom.xml"/>
@@ -10,6 +10,98 @@
     <logo>https://1557100211.github.io/images/avatar.png</logo>
     <icon>https://1557100211.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, github博客</rights>
+    <entry>
+        <title type="html"><![CDATA[Nginx监控工具-GoAccess]]></title>
+        <id>https://1557100211.github.io/post/BpGxZ4yx7/</id>
+        <link href="https://1557100211.github.io/post/BpGxZ4yx7/">
+        </link>
+        <updated>2020-05-20T07:25:26.000Z</updated>
+        <content type="html"><![CDATA[<h5 id="why-goaccess">Why GoAccess?</h5>
+<blockquote>
+<p>GoAccess 被设计成快速的并基于终端的日志分析工具。其核心理念是不需要通过 Web 浏览器就能快速分析并实时查看 Web 服务器的统计数据(这对于需要使用 SSH 来对访问日志进行快速分析或者就是喜欢在终端环境下工作的人来说是超赞的)。<br>
+终端输出仅仅是默认的输出方式，GoAccess 还支持生成完整的实时 HTML 报告(这对分析、监控以及数据可视化都是极好的)，以及 JSON 和 CSV 格式的报告。</p>
+</blockquote>
+<h5 id="下载地址">下载地址</h5>
+<blockquote>
+<p>https://goaccess.io/download</p>
+</blockquote>
+<h5 id="安装">安装</h5>
+<h6 id="yum安装">yum安装</h6>
+<pre><code class="language-java">yum install glib2 glib2-devel GeoIP-devel  ncurses-devel zlib zlib-develyum install gcc -y
+yum -y install GeoIP-update
+yum install goaccess
+#修改/etc/nginx/nginx.conf文件的日志存储格式
+log_format  main  '$remote_addr - $remote_user [$time_local] requesthost:&quot;$http_host&quot;; &quot;$request&quot; requesttime:&quot;$request_time&quot;; '
+        '$status $body_bytes_sent &quot;$http_referer&quot; - $request_body'
+        '&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;';        
+#修改文件/etc/goaccess.conf改成goaccess格式标准对应为
+time-format %T
+date-format %d/%b/%Y
+log-format %h - %^ [%d:%t %^] requesthost:&quot;%v&quot;; &quot;%r&quot; requesttime:&quot;%T&quot;; %s %b &quot;%R&quot; - %^&quot;%u&quot;
+#测试生成页面
+goaccess -f /var/log/nginx/access.log -c -a&gt;/usr/share/nginx/html/go.html
+</code></pre>
+<h6 id="源码安装">源码安装</h6>
+<pre><code class="language-java">#yum安装依赖包
+yum install glib2 glib2-devel GeoIP-devel  ncurses-devel zlib zlib-devel
+yum install gcc -y
+rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-6.noarch.rpm
+yum -y install GeoIP-update
+
+#下载goaccess源码包，并解压编译安装
+wget https://tar.goaccess.io/goaccess-1.2.tar.gz
+tar xzvf goaccess-1.2.tar.gz
+cd goaccess-1.2/./configure --enable-geoip --enable-utf8make &amp;&amp; make install
+
+#修改/etc/nginx/nginx.conf文件的日志存储格式
+log_format  main  '$remote_addr - $remote_user [$time_local] requesthost:&quot;$http_host&quot;; &quot;$request&quot; requesttime:&quot;$request_time&quot;; '
+        '$status $body_bytes_sent &quot;$http_referer&quot; - $request_body'                      '&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;';       
+#修改文件/usr/local/etc/goaccess.conf改成goaccess格式标准对应为
+time-format %T
+date-format %d/%b/%Y
+log-format %h - %^ [%d:%t %^] requesthost:&quot;%v&quot;; &quot;%r&quot; requesttime:&quot;%T&quot;; %s %b &quot;%R&quot; - %^&quot;%u&quot;
+#测试生成页面
+goaccess -f /var/log/nginx/access.log -c -a&gt;/usr/share/nginx/html/go.html
+#后台实时生成数据到goaccess页面
+/usr/local/bin/goaccess /var/log/nginx/access.log -o /usr/share/nginx/html/go.html  --real-time-html &amp;
+</code></pre>
+<h5 id="基本语法">基本语法</h5>
+<blockquote>
+<p>goaccess [ -b ][ -s ][ -e IP_ADDRESS][ - a ] &lt;-f log_file &gt;<br>
+参数说明：<br>
+-f – 日志文件名<br>
+-b – 开启流量统计，如果希望加快分析速度不建议使用该参数<br>
+-s – 开启HTTP响应代码统计<br>
+-a – 开启用户代理统计<br>
+-e – 开启指定IP地址统计，默认禁用<br>
+-p -指定goacces用户配置文件路径</p>
+</blockquote>
+<pre><code class="language-java"> goaccess access2.log -p /etc/goaccess/goaccess.conf -o /mnt/d/dev_soft/goAccess/report.html --real-time-html --port=8888 --geoip-database=/mnt/d/dev_soft/goAccess/GeoLite2-City.mmdb
+</code></pre>
+<h6 id="配置选项">配置选项</h6>
+<blockquote>
+<p>GoAccess 拥有多个配置选项。获取完整的最新配置选项列表，请运行：./configure --help</p>
+</blockquote>
+<ul>
+<li>--enable-debug<br>
+使用调试标志编译且关闭编译器优化。</li>
+<li>--enable-utf8<br>
+宽字符支持。依赖 Ncursesw 模块。</li>
+<li>--enable-geoip=&lt;legacy|mmdb&gt;<br>
+地理位置支持。依赖 MaxMind GeoIP 模块。legacy 将使用原始 GeoIP 数据库。mmdb 将使用增强版 GeoIP2 数据库。</li>
+<li>--enable-tcb=&lt;memhash|btree&gt;<br>
+Tokyo Cabinet 存储支持。 memhash 将使用 Tokyo Cabinet 的内存哈希数据库。 btree 将使用 Tokyo Cabinet 的磁盘 B+Tree 数据库。</li>
+<li>--disable-zlib<br>
+禁止在 B+Tree 数据库上使用 zlib 压缩。</li>
+<li>--disable-bzip<br>
+禁止在 B+Tree 数据库上使用 bzip2 压缩。</li>
+<li>--with-getline<br>
+使用动态扩展行缓冲区用来解析完整的行请求，否则将使用固定大小(4096)的缓冲区。</li>
+<li>--with-openssl<br>
+使 GoAccess 与其 WebSocket 服务器之间的通信能够支持 OpenSSL。</li>
+</ul>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Tomcat监控工具]]></title>
         <id>https://1557100211.github.io/post/aEGAJiLzW/</id>
