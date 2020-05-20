@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://1557100211.github.io</id>
     <title>github博客</title>
-    <updated>2020-05-19T22:25:47.285Z</updated>
+    <updated>2020-05-20T06:30:15.471Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://1557100211.github.io"/>
     <link rel="self" href="https://1557100211.github.io/atom.xml"/>
@@ -10,6 +10,30 @@
     <logo>https://1557100211.github.io/images/avatar.png</logo>
     <icon>https://1557100211.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, github博客</rights>
+    <entry>
+        <title type="html"><![CDATA[Tomcat监控工具]]></title>
+        <id>https://1557100211.github.io/post/aEGAJiLzW/</id>
+        <link href="https://1557100211.github.io/post/aEGAJiLzW/">
+        </link>
+        <updated>2020-05-20T02:25:09.000Z</updated>
+        <content type="html"><![CDATA[<blockquote>
+<p>作为系统管理员，要能监控系统状态，包括主机状态（硬盘、内存、CPU）和服务状态（GC、Thread）。如果没有工具，需要远程登录到服务器，费时费力。<br>
+推荐一款工具Psi-probe，非常强大，可以监控Tomcat发布服务和主机的性能。</p>
+</blockquote>
+<figure data-type="image" tabindex="1"><img src="https://1557100211.github.io/post-images/1589941600334.png" alt="" loading="lazy"></figure>
+<h5 id="psi-probe安装">psi-probe安装</h5>
+<ul>
+<li>下载源码，编译war。<br>
+https://github.com/psi-probe/psi-probe</li>
+<li>直接下载war<br>
+https://github.com/psi-probe/psi-probe/releases/download/3.1.0/probe.war</li>
+<li>安装probe.war。通过Tomcat Manager Deploy war，或者将probe.war放到Tomcat的webapps目录下。</li>
+</ul>
+<h5 id="功能简介">功能简介</h5>
+<p>通过http://host/probe访问服务。<br>
+<img src="https://1557100211.github.io/post-images/1589941685911.png" alt="" loading="lazy"></p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[问题总结一、java final常量修改后，新重新编译class并更新所有引用类]]></title>
         <id>https://1557100211.github.io/post/2ZTgQPbdp/</id>
