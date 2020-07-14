@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>SVN迁移GIT | github博客</title>
+<title>Springboot项目在cmd窗口运行后台卡顿问题 | github博客</title>
 <meta name="description" content="小舟从此逝，江海寄余生">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -111,32 +111,61 @@
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
           <div class="post-detail">
-            <h2 class="post-title">SVN迁移GIT</h2>
-            <div class="post-date">2020-05-18</div>
+            <h2 class="post-title">Springboot项目在cmd窗口运行后台卡顿问题</h2>
+            <div class="post-date">2020-07-14</div>
+            
+              <div class="feature-container" style="background-image: url('https://1557100211.github.io/post-images/kcMn5UKaj.png')">
+              </div>
             
             <div class="post-content">
-              <h4 id="迁移过程">迁移过程</h4>
+              <h3 id="1-背景介绍">1、背景介绍</h3>
+<p>项目使用Springboot开发，项目打成jar后，部署在windows环境下，通过命令：java -jar project.jar的方式启动运行。</p>
+<h3 id="2-问题描述">2、问题描述</h3>
+<p>项目每次启动后，开始时可以正常访问。经过一段时间的运行，通过浏览器系统无法登陆，查看后台日志时，可以看到系统后台卡住，日志不再输出。在CMD窗口输入Ctrl + C，强制结束应用进程后，系统便能正常登录。</p>
+<p>有时，在CMD窗口通过输入回车，后台会将之前卡住的日志全部刷出来，然后便能正常登录，但有时输入回车不起作用。</p>
+<h3 id="3-问题追踪">3、问题追踪</h3>
+<p>当系统后台再次卡住，应用无法访问时，按照如下步骤进行排查定位：</p>
 <ol>
-<li>拉取svn代码并转为git（输入用户名密码）<pre><code class="language-java">git svn clone   http://xxxx.com/project
-</code></pre>
-<img src="https://1557100211.github.io/post-images/1589770874769.png" alt="" loading="lazy"></li>
-<li>关联远程仓库(保证仓库是新建的并且没有任何提交)<pre><code class="language-java">cd project/
-git remote add origin http://xxxx.com/project
-</code></pre>
-</li>
-<li>提交<pre><code class="language-java">git push -u origin master
-</code></pre>
-</li>
+<li>找到java_home的bin下jvisualvm.exe ，双击运行，即可看到下图界面；<br>
+<img src="https://1557100211.github.io/post-images/1594706936975.png" alt="" loading="lazy"></li>
+<li>点击右侧**“线程Dump”**按钮，保存当前所有线程信息，保存为dump文件，可在左侧点击查看保存内容。<br>
+<img src="https://1557100211.github.io/post-images/1594706975795.png" alt="" loading="lazy"></li>
+<li>在CMD窗口输入：Ctrl+C，强制结束应用线程；</li>
+<li>如第二步操作，再次保存结束线程后，所有线程的快照。</li>
 </ol>
+<h3 id="4-线程快照分析">4、线程快照分析</h3>
+<ol>
+<li>线程统计情况对比：<br>
+Ctrl+C执行前<br>
+<img src="https://1557100211.github.io/post-images/1594707048755.png" alt="" loading="lazy"><br>
+Ctrl+C执行后<br>
+<img src="https://1557100211.github.io/post-images/1594707054231.png" alt="" loading="lazy"></li>
+<li>线程执行情况对比：<br>
+Ctrl+C执行前<br>
+<img src="https://1557100211.github.io/post-images/1594707066715.png" alt="" loading="lazy"><br>
+Ctrl+C执行后<br>
+<img src="https://1557100211.github.io/post-images/1594707072491.png" alt="" loading="lazy"></li>
+<li>dump文件内容对比：<br>
+<img src="https://1557100211.github.io/post-images/1594707097297.png" alt="" loading="lazy"><br>
+<img src="https://1557100211.github.io/post-images/1594707102232.png" alt="" loading="lazy"><br>
+执行Ctrl+C线程状态变化的是QuartzScheduler_QuartzSchedulerThread，第二个线程挂起，在等待第一个线程；第一个线程在写日志，但一直处在Runnable状态。<br>
+结论：定时任务执行时，写日志输出IO阻塞，导致应用后台卡住。</li>
+</ol>
+<h3 id="5-解决办法">5、解决办法</h3>
+<ol>
+<li>将springboot日志输出，修改为异步的方式输出，避免同步输出阻塞；</li>
+<li>由于windows中cmd存在日志输出bug，导致经常性日志卡住，具体表现为：输出内容卡死问题（命令行卡死不动，但是进程和线程依然再运行），随便敲一下回车键，命令行会马上打印卡死期间输出的信息。这种情况，只需要对cmd窗口进行设置即可：右键窗口标题-属性，把快速编辑模式关掉就能避免这个问题。</li>
+</ol>
+<p>原文链接：https://blog.csdn.net/qq_40112386/java/article/details/86681247</p>
 
             </div>
             
             
               <div class="next-post">
                 <div class="next">下一篇</div>
-                <a href="https://1557100211.github.io/post/mybatis-zhong-tinyint1zhuan-hua-wei-boolean/">
+                <a href="https://1557100211.github.io/post/Tked_OlVP/">
                   <h3 class="post-title">
-                    Mybatis中tinyint(1)转化为boolean
+                    Tomcat8优化实践
                   </h3>
                 </a>
               </div>

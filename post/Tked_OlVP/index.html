@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>Nginx | github博客</title>
+<title>Tomcat8优化实践 | github博客</title>
 <meta name="description" content="小舟从此逝，江海寄余生">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -110,33 +110,53 @@
 
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
-          <h2 class="current-tag">标签: Nginx</h2>
-          
-            <article class="post-item">
-              <div class="left">
-                <a href="https://1557100211.github.io/post/BpGxZ4yx7/">
-                  <h2 class="post-title">Nginx监控工具-GoAccess</h2>
-                </a>
-                <div class="post-date">
-                  2020-05-20
-                </div>
-                <div class="post-abstract">
-                  
-                </div>
-              </div>
-              
-                <a class="right" href="https://1557100211.github.io/post/BpGxZ4yx7/">
-                  <div class="feature-container" style="background-image: url('https://1557100211.github.io/post-images/BpGxZ4yx7.png')">
-                  </div>
-                </a>
-              
-            </article>
-          
+          <div class="post-detail">
+            <h2 class="post-title">Tomcat8优化实践</h2>
+            <div class="post-date">2020-05-27</div>
+            
+            <div class="post-content">
+              <blockquote>
+<p>来源：https://www.jianshu.com/p/b2826ead1c4e</p>
+</blockquote>
+<h5 id="tomcat8优化">Tomcat8优化</h5>
+<ol>
+<li>Tomcat配置优化
+<ol>
+<li>
+<p>部署安装tomcat8<br>
+下载地址：https://tomcat.apache.org/download-80.cgi<br>
+<img src="https://1557100211.github.io/post-images/1590566733293.png" alt="" loading="lazy"><br>
+<img src="https://1557100211.github.io/post-images/1590566796727.webp" alt="" loading="lazy"></p>
+</li>
+<li>
+<p>禁用AJP连接<br>
+什么是AJP呢？<br>
+AJP（Apache JServer Protocol）<br>
+AJPv13协议是面向包的。WEB服务器和Servlet容器通过TCP连接来交互；为了节省Socket创建的昂贵代价，WEB服务器会<br>
+尝试维护一个永久TCP连接到servlet容器，并且在多个请求和响应周期过程会重用连接。</p>
+</li>
+<li></li>
+</ol>
+</li>
+<li>使用Apache JMeter进行测试</li>
+</ol>
 
-          <div class="pagination-container">
-  
-  
-</div>
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://1557100211.github.io/post/BpGxZ4yx7/">
+                  <h3 class="post-title">
+                    Nginx监控工具-GoAccess
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
 
         </div>
       </div>
