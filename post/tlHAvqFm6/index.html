@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>优秀源码推荐 | github博客</title>
+<title>CentOS7配置nexus开机自启动 | github博客</title>
 <meta name="description" content="小舟从此逝，江海寄余生">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -111,20 +111,89 @@
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
           <div class="post-detail">
-            <h2 class="post-title">优秀源码推荐</h2>
-            <div class="post-date">2020-05-15</div>
+            <h2 class="post-title">CentOS7配置nexus开机自启动</h2>
+            <div class="post-date">2020-07-22</div>
             
             <div class="post-content">
-              <p>工程</p>
+              <h4 id="新建nexus启动脚本">新建nexus启动脚本</h4>
+<p>进入/etc/init.d目录，新建脚本文件nexus</p>
+<pre><code class="language-java">// 进入/etc/init.d
+[root@linux_maven etc]# cd /etc/init.d/
+ 
+// 新建脚本文件nexus
+[root@linux_maven init.d]# vim nexus
+</code></pre>
+<p>脚本内容:</p>
+<pre><code class="language-java">#!/bin/bash
+#chkconfig:2345 20 90
+#description:nexus
+#processname:nexus
+ 
+export JAVA_HOME=/root/apps/jdk1.8/
+ 
+case $1 in
+        start) su root /usr/local/nexus3.21/bin/nexus start;;
+        stop) su root /usr/local/nexus3.21/bin/nexus stop;;
+        status) su root /usr/local/nexus3.21/bin/nexus status;;
+        restart) su root /usr/local/nexus3.21/bin/nexus restart;;
+        dump) su root /usr/local/nexus3.21/bin/nexus dump;;
+        console) su root /usr/local/nexus3.21/bin/nexus console;;
+        *) echo &quot;Usage: nexus {start|stop|run|run-redirect|status|restart|force-reload}&quot;
+esac
+</code></pre>
+<h4 id="设置脚本权限">设置脚本权限</h4>
+<pre><code class="language-java">[root@linux_maven init.d]# chmod +x /etc/init.d/nexus 
+</code></pre>
+<h4 id="使用service命令使用nexus">使用service命令使用nexus</h4>
+<pre><code class="language-java">[root@linux_maven init.d]# service nexus status
+
+WARNING: ************************************************************
+
+WARNING: Detected execution as &quot;root&quot; user.  This is NOT recommended!
+
+WARNING: ************************************************************
+
+nexus is running.
+</code></pre>
+<h4 id="添加到开机启动">添加到开机启动#</h4>
+<pre><code class="language-java">[root@linux_maven init.d]# chkconfig nexus on
+</code></pre>
+<h4 id="查看nexus开机启动">查看nexus开机启动</h4>
+<pre><code class="language-java">[root@linux_maven ~]# chkconfig --list nexus
+
+Note: This output shows SysV services only and does not include native
+      systemd services. SysV configuration data might be overridden by native
+      systemd configuration.
+ 
+      If you want to list systemd services use 'systemctl list-unit-files'.
+      To see services enabled on particular target use
+      'systemctl list-dependencies [target]'.
+ 
+
+nexus           0:off   1:off   2:on    3:on    4:on    5:on    6:off
+</code></pre>
+<h4 id="设置防火墙">设置防火墙</h4>
+<pre><code class="language-java">// 进入防火墙设置文件目录
+[root@linux_maven init.d]# cd /etc/firewalld/zones/
+// 使用vim, 修改防火墙配置文件
+[root@linux_maven zones]# vim public.xml
+</code></pre>
+<p>添加以下放开端口内容, 其它不变</p>
+<pre><code class="language-java">  &lt;rule family=&quot;ipv4&quot;&gt;
+  &lt;!-- 开放8081端口给任意ip  --&gt;
+　　&lt;port protocol=&quot;tcp&quot; port=&quot;8081&quot;/&gt;
+　　&lt;accept/&gt;
+  &lt;/rule&gt;
+</code></pre>
 
             </div>
             
             
               <div class="next-post">
                 <div class="next">下一篇</div>
-                <a href="https://1557100211.github.io/post/hello-gridea/">
+                <a href="https://1557100211.github.io/post/sgUTJX1IO/">
                   <h3 class="post-title">
-                    Hello Gridea
+                    IntelliJ IDEA必装插件
                   </h3>
                 </a>
               </div>

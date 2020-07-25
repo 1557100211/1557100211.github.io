@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://1557100211.github.io</id>
     <title>github博客</title>
-    <updated>2020-07-22T09:32:23.556Z</updated>
+    <updated>2020-07-25T02:03:56.971Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://1557100211.github.io"/>
     <link rel="self" href="https://1557100211.github.io/atom.xml"/>
@@ -10,6 +10,170 @@
     <logo>https://1557100211.github.io/images/avatar.png</logo>
     <icon>https://1557100211.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, github博客</rights>
+    <entry>
+        <title type="html"><![CDATA[Hyper-V和IDEA运行端口占用问题]]></title>
+        <id>https://1557100211.github.io/post/fKDxWMjSW/</id>
+        <link href="https://1557100211.github.io/post/fKDxWMjSW/">
+        </link>
+        <updated>2020-07-22T09:39:19.000Z</updated>
+        <content type="html"><![CDATA[<h4 id="原因分析">原因分析</h4>
+<p>首先我们可以查看一下我们系统默认的端口占用范围；</p>
+<pre><code class="language-java">netsh int ipv4 show dynamicport tcp
+
+Copy
+Microsoft Windows [版本 10.0.18363.752]
+(c) 2019 Microsoft Corporation。保留所有权利。
+
+netsh int ipv4 show dynamicport tcp
+
+协议 tcp 动态端口范围
+---------------------------------
+启动端口        : 1024
+端口数          : 13977
+</code></pre>
+<p>我们可以看到Windows系统默认的tcp 动态端口范围为：1024~13977。当我们开启Hyper-V后，系统默认会分配给一些保留端口供Hyper-V使用：</p>
+<pre><code class="language-java">netsh interface ipv4 show excludedportrange protocol=tcp
+协议 tcp 端口排除范围
+ 
+开始端口    结束端口
+----------    --------
+      1026        1125
+      1226        1325
+      1326        1425
+      1426        1525
+      1526        1625
+      2180        2279
+</code></pre>
+<p>我们可以看到IDEA运行Tomcat需要JMX的1099端口刚好在端口排除范围中，这样就导致了IDEA需要使用1099端口是会被占用，这样你当然就不能运行了。</p>
+<h4 id="解决方法">解决方法</h4>
+<p>使用管理员身份运行cmd，重置端口，然后重启</p>
+<pre><code class="language-java">netsh winsock reset
+</code></pre>
+<p>这样你的tcp端口排除范围可能刚好不包含1099端口，这样你当然就可以用你的IDEA运行Tomcat应用了。但是你啥时候会出现就不得而知了。</p>
+<h4 id="终极解决">终极解决</h4>
+<p>3.1 关闭Hyper-V#</p>
+<pre><code class="language-java">Microsoft Windows [版本 10.0.18363.752]
+(c) 2019 Microsoft Corporation。保留所有权利。
+dism.exe /Online /Disable-Feature:Microsoft-Hyper-V
+</code></pre>
+<p>或者采用传统方式，在控制面板的“程序和功能”中，找到“Windows功能”，取消Hyper-V的勾选。这两种方法都会要求重启。</p>
+<p>3.2 修改动态端口范围#<br>
+使用管理员身份运行cmd</p>
+<pre><code class="language-java">netsh int ipv4 set dynamicport tcp start=49152 num=16383
+netsh int ipv4 set dynamicport udp start=49152 num=16383
+</code></pre>
+<p>确定。<br>
+然后检查结果</p>
+<pre><code class="language-java">netsh int ipv4 show dynamicport tcp
+
+协议 tcp 动态端口范围
+---------------------------------
+启动端口        : 49152
+端口数          : 16383
+</code></pre>
+<p>3.3 开启Hyper-V#</p>
+<pre><code class="language-java">dism.exe /Online /Enable-Feature:Microsoft-Hyper-V /All
+部署映像服务和管理工具
+版本: 10.0.18362.1
+映像版本: 10.0.18363.752
+启用一个或多个功能
+[==========================100.0%==========================]
+操作成功完成。
+重新启动 Windows 以完成该操作。
+是否立即重新启动计算机? (Y/N)
+开启Hyper-V
+</code></pre>
+<p>或者采用传统方式，在控制面板的“程序和功能”中，找到“Windows功能”，取消Hyper-V的勾选。这两种方法都会要求重启。</p>
+<blockquote>
+<p>使用终极解决方案解决之后，你会发现你的IDEA又可以正常运行了。另外这里说一个单独排除端口的命令，后面可能会用到：</p>
+</blockquote>
+<pre><code class="language-java">netsh int ipv4 add excludedportrange protocol=tcp startport=50051 numberofports=1
+</code></pre>
+<p>使用上面的命令之后我们就可以单独排除某个端口了，保障改端口不会被其他应用占用。</p>
+<blockquote>
+<p>https://www.kairlec.com/archives/285<br>
+https://www.cnblogs.com/eelve/p/12679125.html</p>
+</blockquote>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[CentOS7配置nexus开机自启动]]></title>
+        <id>https://1557100211.github.io/post/tlHAvqFm6/</id>
+        <link href="https://1557100211.github.io/post/tlHAvqFm6/">
+        </link>
+        <updated>2020-07-22T09:38:14.000Z</updated>
+        <content type="html"><![CDATA[<h4 id="新建nexus启动脚本">新建nexus启动脚本</h4>
+<p>进入/etc/init.d目录，新建脚本文件nexus</p>
+<pre><code class="language-java">// 进入/etc/init.d
+[root@linux_maven etc]# cd /etc/init.d/
+ 
+// 新建脚本文件nexus
+[root@linux_maven init.d]# vim nexus
+</code></pre>
+<p>脚本内容:</p>
+<pre><code class="language-java">#!/bin/bash
+#chkconfig:2345 20 90
+#description:nexus
+#processname:nexus
+ 
+export JAVA_HOME=/root/apps/jdk1.8/
+ 
+case $1 in
+        start) su root /usr/local/nexus3.21/bin/nexus start;;
+        stop) su root /usr/local/nexus3.21/bin/nexus stop;;
+        status) su root /usr/local/nexus3.21/bin/nexus status;;
+        restart) su root /usr/local/nexus3.21/bin/nexus restart;;
+        dump) su root /usr/local/nexus3.21/bin/nexus dump;;
+        console) su root /usr/local/nexus3.21/bin/nexus console;;
+        *) echo &quot;Usage: nexus {start|stop|run|run-redirect|status|restart|force-reload}&quot;
+esac
+</code></pre>
+<h4 id="设置脚本权限">设置脚本权限</h4>
+<pre><code class="language-java">[root@linux_maven init.d]# chmod +x /etc/init.d/nexus 
+</code></pre>
+<h4 id="使用service命令使用nexus">使用service命令使用nexus</h4>
+<pre><code class="language-java">[root@linux_maven init.d]# service nexus status
+
+WARNING: ************************************************************
+
+WARNING: Detected execution as &quot;root&quot; user.  This is NOT recommended!
+
+WARNING: ************************************************************
+
+nexus is running.
+</code></pre>
+<h4 id="添加到开机启动">添加到开机启动#</h4>
+<pre><code class="language-java">[root@linux_maven init.d]# chkconfig nexus on
+</code></pre>
+<h4 id="查看nexus开机启动">查看nexus开机启动</h4>
+<pre><code class="language-java">[root@linux_maven ~]# chkconfig --list nexus
+
+Note: This output shows SysV services only and does not include native
+      systemd services. SysV configuration data might be overridden by native
+      systemd configuration.
+ 
+      If you want to list systemd services use 'systemctl list-unit-files'.
+      To see services enabled on particular target use
+      'systemctl list-dependencies [target]'.
+ 
+
+nexus           0:off   1:off   2:on    3:on    4:on    5:on    6:off
+</code></pre>
+<h4 id="设置防火墙">设置防火墙</h4>
+<pre><code class="language-java">// 进入防火墙设置文件目录
+[root@linux_maven init.d]# cd /etc/firewalld/zones/
+// 使用vim, 修改防火墙配置文件
+[root@linux_maven zones]# vim public.xml
+</code></pre>
+<p>添加以下放开端口内容, 其它不变</p>
+<pre><code class="language-java">  &lt;rule family=&quot;ipv4&quot;&gt;
+  &lt;!-- 开放8081端口给任意ip  --&gt;
+　　&lt;port protocol=&quot;tcp&quot; port=&quot;8081&quot;/&gt;
+　　&lt;accept/&gt;
+  &lt;/rule&gt;
+</code></pre>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[IntelliJ IDEA必装插件]]></title>
         <id>https://1557100211.github.io/post/sgUTJX1IO/</id>
@@ -365,43 +529,6 @@ select table_name,table_rows from tables where TABLE_SCHEMA = 'szdb' order by ta
 #数据库总数量
 SELECT sum(table_rows) from tables where TABLE_SCHEMA = 'szdb' order by table_rows desc;
 </code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[SVN迁移GIT]]></title>
-        <id>https://1557100211.github.io/post/mkm2IT70s/</id>
-        <link href="https://1557100211.github.io/post/mkm2IT70s/">
-        </link>
-        <updated>2020-05-18T02:50:28.000Z</updated>
-        <content type="html"><![CDATA[<h4 id="迁移过程">迁移过程</h4>
-<ol>
-<li>拉取svn代码并转为git（输入用户名密码）<pre><code class="language-java">git svn clone   http://xxxx.com/project
-</code></pre>
-<img src="https://1557100211.github.io/post-images/1589770874769.png" alt="" loading="lazy"></li>
-<li>关联远程仓库(保证仓库是新建的并且没有任何提交)<pre><code class="language-java">cd project/
-git remote add origin http://xxxx.com/project
-</code></pre>
-</li>
-<li>提交<pre><code class="language-java">git push -u origin master
-</code></pre>
-</li>
-</ol>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Mybatis中tinyint(1)转化为boolean]]></title>
-        <id>https://1557100211.github.io/post/mybatis-zhong-tinyint1zhuan-hua-wei-boolean/</id>
-        <link href="https://1557100211.github.io/post/mybatis-zhong-tinyint1zhuan-hua-wei-boolean/">
-        </link>
-        <updated>2020-05-18T01:33:36.000Z</updated>
-        <content type="html"><![CDATA[<h4 id="问题描述">问题描述:</h4>
-<p>使用Mybatis查询tinyint(1)字段数据,返回值为Map类型,那么tinyint(1)的数据默认会转化为boolean类型数据.</p>
-<h4 id="解决方案">解决方案:</h4>
-<ol>
-<li>使用ifnull(column, 0)处理该字段,个人测试过可以;</li>
-<li>在jdbcUrl添加参数: tinyInt1isBit=false（默认为true）；</li>
-<li>避免使用长度为1的tinyint类型字段存储数字格式的数据;</li>
-</ol>
 ]]></content>
     </entry>
 </feed>

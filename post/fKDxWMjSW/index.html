@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>Nexus从windows迁移至Linux | github博客</title>
+<title>Hyper-V和IDEA运行端口占用问题 | github博客</title>
 <meta name="description" content="小舟从此逝，江海寄余生">
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -111,76 +111,100 @@
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
           <div class="post-detail">
-            <h2 class="post-title">Nexus从windows迁移至Linux</h2>
+            <h2 class="post-title">Hyper-V和IDEA运行端口占用问题</h2>
             <div class="post-date">2020-07-22</div>
             
-              <div class="feature-container" style="background-image: url('https://1557100211.github.io/post-images/sD6FTsLeh.png')">
+              <div class="feature-container" style="background-image: url('https://1557100211.github.io/post-images/fKDxWMjSW.png')">
               </div>
             
             <div class="post-content">
-              <h4 id="下载nexus-linux包">下载nexus linux包</h4>
-<p>官网下载地址：https://www.sonatype.com/download-oss-sonatype<br>
-将软件包上传至服务器--&gt;创建nexus目录 --&gt;创建用户--&gt;解压缩包--&gt;将原平台文件包迁移至nexus目录--&gt;授权--&gt;启动：</p>
-<ol>
-<li>创建用户</li>
-</ol>
-<pre><code class="language-java"># useradd nexus
-# id nexus
-uid=1002(nexus) gid=1002(nexus) groups=1002(nexus)
+              <h4 id="原因分析">原因分析</h4>
+<p>首先我们可以查看一下我们系统默认的端口占用范围；</p>
+<pre><code class="language-java">netsh int ipv4 show dynamicport tcp
+
+Copy
+Microsoft Windows [版本 10.0.18363.752]
+(c) 2019 Microsoft Corporation。保留所有权利。
+
+netsh int ipv4 show dynamicport tcp
+
+协议 tcp 动态端口范围
+---------------------------------
+启动端口        : 1024
+端口数          : 13977
 </code></pre>
-<ol start="2">
-<li>创建nexus目录</li>
-</ol>
-<pre><code class="language-java"># mkdir /usr/local/nexus
+<p>我们可以看到Windows系统默认的tcp 动态端口范围为：1024~13977。当我们开启Hyper-V后，系统默认会分配给一些保留端口供Hyper-V使用：</p>
+<pre><code class="language-java">netsh interface ipv4 show excludedportrange protocol=tcp
+协议 tcp 端口排除范围
+ 
+开始端口    结束端口
+----------    --------
+      1026        1125
+      1226        1325
+      1326        1425
+      1426        1525
+      1526        1625
+      2180        2279
 </code></pre>
-<ol>
-<li>解压缩包</li>
-</ol>
-<pre><code class="language-java"># tar xf nexus-3.13.0-01-unix.tar.gz -C /usr/local/nexus/
+<p>我们可以看到IDEA运行Tomcat需要JMX的1099端口刚好在端口排除范围中，这样就导致了IDEA需要使用1099端口是会被占用，这样你当然就不能运行了。</p>
+<h4 id="解决方法">解决方法</h4>
+<p>使用管理员身份运行cmd，重置端口，然后重启</p>
+<pre><code class="language-java">netsh winsock reset
 </code></pre>
-<ol start="4">
-<li>将sonatype-work文件移走</li>
-</ol>
-<pre><code class="language-java"># mv sonatype-work /tmp
+<p>这样你的tcp端口排除范围可能刚好不包含1099端口，这样你当然就可以用你的IDEA运行Tomcat应用了。但是你啥时候会出现就不得而知了。</p>
+<h4 id="终极解决">终极解决</h4>
+<p>3.1 关闭Hyper-V#</p>
+<pre><code class="language-java">Microsoft Windows [版本 10.0.18363.752]
+(c) 2019 Microsoft Corporation。保留所有权利。
+dism.exe /Online /Disable-Feature:Microsoft-Hyper-V
 </code></pre>
-<ol start="5">
-<li>
-<p>到老平台将文件目录sonatype-work打包并传至新nexus服务器</p>
-</li>
-<li>
-<p>授权</p>
-</li>
-</ol>
-<pre><code class="language-java"># chown -R nexus.nexus /usr/lcaol/nexus/
+<p>或者采用传统方式，在控制面板的“程序和功能”中，找到“Windows功能”，取消Hyper-V的勾选。这两种方法都会要求重启。</p>
+<p>3.2 修改动态端口范围#<br>
+使用管理员身份运行cmd</p>
+<pre><code class="language-java">netsh int ipv4 set dynamicport tcp start=49152 num=16383
+netsh int ipv4 set dynamicport udp start=49152 num=16383
 </code></pre>
-<ol start="7">
-<li>切换至nexus用户并启动nexus</li>
-</ol>
-<pre><code class="language-java"># su - nexus
-$ /usr/local/nexus/nexus-3.13.0-01/bin/nexus start
+<p>确定。<br>
+然后检查结果</p>
+<pre><code class="language-java">netsh int ipv4 show dynamicport tcp
+
+协议 tcp 动态端口范围
+---------------------------------
+启动端口        : 49152
+端口数          : 16383
 </code></pre>
-<ol start="8">
-<li>查看是否启动成功</li>
-</ol>
-<pre><code class="language-java"># ps -ef|grep nexus
+<p>3.3 开启Hyper-V#</p>
+<pre><code class="language-java">dism.exe /Online /Enable-Feature:Microsoft-Hyper-V /All
+部署映像服务和管理工具
+版本: 10.0.18362.1
+映像版本: 10.0.18363.752
+启用一个或多个功能
+[==========================100.0%==========================]
+操作成功完成。
+重新启动 Windows 以完成该操作。
+是否立即重新启动计算机? (Y/N)
+开启Hyper-V
 </code></pre>
+<p>或者采用传统方式，在控制面板的“程序和功能”中，找到“Windows功能”，取消Hyper-V的勾选。这两种方法都会要求重启。</p>
+<blockquote>
+<p>使用终极解决方案解决之后，你会发现你的IDEA又可以正常运行了。另外这里说一个单独排除端口的命令，后面可能会用到：</p>
+</blockquote>
+<pre><code class="language-java">netsh int ipv4 add excludedportrange protocol=tcp startport=50051 numberofports=1
+</code></pre>
+<p>使用上面的命令之后我们就可以单独排除某个端口了，保障改端口不会被其他应用占用。</p>
+<blockquote>
+<p>https://www.kairlec.com/archives/285<br>
+https://www.cnblogs.com/eelve/p/12679125.html</p>
+</blockquote>
 
             </div>
-            
-              <div class="tag-container">
-                
-                  <a href="https://1557100211.github.io/tag/ZV9gFR8LX/" class="tag">
-                    nexus迁移
-                  </a>
-                
-              </div>
             
             
               <div class="next-post">
                 <div class="next">下一篇</div>
-                <a href="https://1557100211.github.io/post/kcMn5UKaj/">
+                <a href="https://1557100211.github.io/post/tlHAvqFm6/">
                   <h3 class="post-title">
-                    Springboot项目在cmd窗口运行后台卡顿问题
+                    CentOS7配置nexus开机自启动
                   </h3>
                 </a>
               </div>
